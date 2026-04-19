@@ -1,0 +1,25 @@
+{
+  "schemaVersion": 1,
+  "id": "quizsurvival",
+  "version": "${version}",
+  "name": "Quiz Survival",
+  "description": "A survival mod where every action requires answering quiz questions. Supports mining, combat, jumping, interaction with configurable quiz system.",
+  "authors": ["MuJin"],
+  "contact": {
+    "sources": "https://github.com/ZzaiQWQ/quizsurvival"
+  },
+  "license": "MIT",
+  "icon": "assets/quizsurvival/icon.png",
+  "environment": "*",
+  "entrypoints": {
+    "main": ["com.quizmod.QuizMod"],
+    "client": ["com.quizmod.client.QuizModClient"]
+  },
+  "mixins": ["quizsurvival.mixins.json"],
+  "depends": {
+    "fabricloader": ">=0.16.0",
+    "minecraft": "~1.21.11",
+    "java": ">=21",
+    "fabric-api": "*"
+  }
+}

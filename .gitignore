@@ -1,0 +1,25 @@
+# Gradle
+.gradle/
+build/
+out/
+gradle-temp/
+
+# IDE
+.idea/
+*.iml
+*.ipr
+*.iws
+.vscode/
+
+# Runtime
+run/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# JVM crash dumps
+*.hprof
+
+# Fabric
+remappedSrc/

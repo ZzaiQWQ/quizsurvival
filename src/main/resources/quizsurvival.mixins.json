@@ -1,0 +1,11 @@
+{
+  "required": true,
+  "package": "com.quizmod.mixin",
+  "compatibilityLevel": "JAVA_21",
+  "mixins": [
+    "ServerPlayerJumpMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}
