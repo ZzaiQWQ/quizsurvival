@@ -1,3 +1,13 @@
+/*
+ * Quiz Survival Mod
+ * Copyright (c) 2026 oaoi
+ * https://github.com/ZzaiQWQ/quizsurvival
+ *
+ * This software is licensed under a custom non-commercial license.
+ * You may NOT sell or commercially distribute this software.
+ * You may NOT remove or alter this copyright notice.
+ * See LICENSE file for full terms.
+ */
 package com.quizmod.client;
 
 import net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback;
@@ -12,7 +22,7 @@ public class QuizHud implements HudRenderCallback {
     // 客户端缓存的剩余次数
     public static final Map<String, Integer> remainingActions = new LinkedHashMap<>();
 
-    private static final Map<String, String> TYPE_NAMES = Map.of(
+    private static final Map<String, String> TYPE_NAMES_ZH = Map.of(
             "chop", "§a砍伐",
             "ore", "§b矿物",
             "stone", "§7石头",
@@ -22,6 +32,22 @@ public class QuizHud implements HudRenderCallback {
             "jump", "§3跳跃",
             "other", "§f方块"
     );
+    private static final Map<String, String> TYPE_NAMES_EN = Map.of(
+            "chop", "§aChop",
+            "ore", "§bOre",
+            "stone", "§7Stone",
+            "dirt", "§6Dirt",
+            "interact", "§dInteract",
+            "combat", "§cCombat",
+            "jump", "§3Jump",
+            "other", "§fBlock"
+    );
+
+    private static boolean isEnglish() {
+        MinecraftClient client = MinecraftClient.getInstance();
+        String lang = client.options.language;
+        return lang != null && lang.startsWith("en");
+    }
 
     public static void parseAndUpdate(String data) {
         remainingActions.clear();
@@ -52,13 +78,14 @@ public class QuizHud implements HudRenderCallback {
 
         // 标题背景
         context.fill(x - 2, y - 2, x + 82, y + 10, 0x88000000);
-        context.drawTextWithShadow(tr, "§e§l[答题生存]", x, y, 0xFFFFAA00);
+        String title = isEnglish() ? "§e§l[Quiz Survival]" : "§e§l[答题生存]";
+        context.drawTextWithShadow(tr, title, x, y, 0xFFFFAA00);
         y += 12;
 
         for (var entry : remainingActions.entrySet()) {
             int count = entry.getValue();
             if (count <= 0) continue;
-            String name = TYPE_NAMES.getOrDefault(entry.getKey(), entry.getKey());
+            String name = (isEnglish() ? TYPE_NAMES_EN : TYPE_NAMES_ZH).getOrDefault(entry.getKey(), entry.getKey());
             String text = name + "§r: §f" + count;
             context.fill(x - 2, y - 1, x + 82, y + 9, 0x66000000);
             context.drawTextWithShadow(tr, text, x, y, 0xFFFFFFFF);

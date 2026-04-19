@@ -1,0 +1,252 @@
+[
+  {
+    "question": "lim(x→0) sinx/x 的值是？",
+    "options": ["0", "1", "∞", "不存在"],
+    "answer": 1
+  },
+  {
+    "question": "函数 f(x)=e^x 的导数是？",
+    "options": ["xe^(x-1)", "e^x", "e^(x-1)", "x·e^x"],
+    "answer": 1
+  },
+  {
+    "question": "∫x²dx 等于？",
+    "options": ["x³+C", "x³/3+C", "2x+C", "x²/2+C"],
+    "answer": 1
+  },
+  {
+    "question": "(sinx)' 等于？",
+    "options": ["-cosx", "cosx", "-sinx", "tanx"],
+    "answer": 1
+  },
+  {
+    "question": "(lnx)' 等于？",
+    "options": ["1/x", "x", "lnx", "e^x"],
+    "answer": 0
+  },
+  {
+    "question": "lim(n→∞) (1+1/n)^n 等于？",
+    "options": ["1", "π", "e", "∞"],
+    "answer": 2
+  },
+  {
+    "question": "∫(1/x)dx 等于？",
+    "options": ["x²/2+C", "ln|x|+C", "-1/x²+C", "e^x+C"],
+    "answer": 1
+  },
+  {
+    "question": "函数 y=x³ 在 x=0 处的极值情况？",
+    "options": ["极大值", "极小值", "拐点，非极值", "不可导"],
+    "answer": 2
+  },
+  {
+    "question": "二阶导数 f''(x)>0 说明函数？",
+    "options": ["单调递增", "单调递减", "凹函数(上凸)", "凸函数(下凸)"],
+    "answer": 3
+  },
+  {
+    "question": "∫₀¹ x dx 等于？",
+    "options": ["0", "1/2", "1", "2"],
+    "answer": 1
+  },
+  {
+    "question": "tanx 的导数是？",
+    "options": ["1/cos²x", "sec²x", "1+tan²x", "以上都对"],
+    "answer": 3
+  },
+  {
+    "question": "∫e^x dx 等于？",
+    "options": ["xe^x+C", "e^x+C", "e^(x+1)+C", "e^x/x+C"],
+    "answer": 1
+  },
+  {
+    "question": "复合函数 y=sin(2x) 的导数是？",
+    "options": ["cos(2x)", "2cos(2x)", "-2cos(2x)", "2sin(2x)"],
+    "answer": 1
+  },
+  {
+    "question": "不定积分 ∫cos(x)dx 等于？",
+    "options": ["-sinx+C", "sinx+C", "cosx+C", "tanx+C"],
+    "answer": 1
+  },
+  {
+    "question": "lim(x→∞) 1/x 等于？",
+    "options": ["1", "0", "∞", "不存在"],
+    "answer": 1
+  },
+  {
+    "question": "函数 f(x)=|x| 在 x=0 处？",
+    "options": ["可导", "不可导但连续", "不连续", "可导且导数为0"],
+    "answer": 1
+  },
+  {
+    "question": "∫sin(x)dx 等于？",
+    "options": ["cosx+C", "-cosx+C", "sinx+C", "-sinx+C"],
+    "answer": 1
+  },
+  {
+    "question": "洛必达法则适用于哪种极限？",
+    "options": ["0/0 或 ∞/∞", "0×∞", "1^∞", "以上都可（需变形）"],
+    "answer": 3
+  },
+  {
+    "question": "曲线 y=x² 在 (1,1) 处的切线斜率是？",
+    "options": ["1", "2", "3", "1/2"],
+    "answer": 1
+  },
+  {
+    "question": "∫₀^π sinx dx 等于？",
+    "options": ["0", "1", "2", "π"],
+    "answer": 2
+  },
+  {
+    "question": "函数 y=1/x 的原函数是？",
+    "options": ["ln|x|+C", "-1/x²+C", "x²/2+C", "e^x+C"],
+    "answer": 0
+  },
+  {
+    "question": "y=x^n 的导数是？",
+    "options": ["nx^n", "nx^(n-1)", "(n-1)x^n", "x^(n+1)/(n+1)"],
+    "answer": 1
+  },
+  {
+    "question": "以下哪个是麦克劳林级数 e^x 的展开？",
+    "options": ["Σ x^n/n!", "Σ x^n/n", "Σ nx^n", "Σ x^n"],
+    "answer": 0
+  },
+  {
+    "question": "偏导数 ∂(xy²)/∂x 等于？",
+    "options": ["2xy", "y²", "xy", "x²y"],
+    "answer": 1
+  },
+  {
+    "question": "微分方程 y'=y 的通解是？",
+    "options": ["y=Cx", "y=Ce^x", "y=C/x", "y=Cx²"],
+    "answer": 1
+  },
+  {
+    "question": "行列式 |A| = 0 说明矩阵A？",
+    "options": ["可逆", "不可逆(奇异)", "正定", "对称"],
+    "answer": 1
+  },
+  {
+    "question": "二重积分 ∬dxdy 在单位圆上的值是？",
+    "options": ["π", "2π", "1", "4"],
+    "answer": 0
+  },
+  {
+    "question": "级数 Σ(1/n) (n=1到∞) 是？",
+    "options": ["收敛", "发散", "条件收敛", "绝对收敛"],
+    "answer": 1
+  },
+  {
+    "question": "∫₁^e (1/x)dx 等于？",
+    "options": ["0", "1", "e", "1/e"],
+    "answer": 1
+  },
+  {
+    "question": "梯度 ∇f 指向什么方向？",
+    "options": ["函数值下降最快", "函数值上升最快", "等值线方向", "随机方向"],
+    "answer": 1
+  },
+  {
+    "question": "泰勒公式中，sinx 在 x=0 展开的首项是？",
+    "options": ["1", "x", "x²", "x³"],
+    "answer": 1
+  },
+  {
+    "question": "连续函数在闭区间上一定有？",
+    "options": ["导数", "最大值和最小值", "不定积分", "拐点"],
+    "answer": 1
+  },
+  {
+    "question": "函数 y=e^(-x²) 的图像形状是？",
+    "options": ["直线", "抛物线", "钟形曲线", "双曲线"],
+    "answer": 2
+  },
+  {
+    "question": "∫₋₁¹ x³ dx 等于？",
+    "options": ["0", "1/4", "2/3", "1"],
+    "answer": 0
+  },
+  {
+    "question": "矩阵乘法满足交换律吗？",
+    "options": ["满足", "一般不满足", "只有方阵满足", "只有对角阵满足"],
+    "answer": 1
+  },
+  {
+    "question": "隐函数 x²+y²=1 求 dy/dx？",
+    "options": ["x/y", "-x/y", "y/x", "-y/x"],
+    "answer": 1
+  },
+  {
+    "question": "∫x·e^x dx 用什么方法计算？",
+    "options": ["换元法", "分部积分法", "有理函数分解", "直接积分"],
+    "answer": 1
+  },
+  {
+    "question": "中值定理要求函数满足什么条件？",
+    "options": ["可导", "连续", "闭区间连续，开区间可导", "处处可导"],
+    "answer": 2
+  },
+  {
+    "question": "向量 (1,0,0) 和 (0,1,0) 的叉积是？",
+    "options": ["(0,0,1)", "(0,0,-1)", "(1,1,0)", "0"],
+    "answer": 0
+  },
+  {
+    "question": "柯西-施瓦茨不等式的形式是？",
+    "options": ["|a·b| ≤ |a|·|b|", "|a+b| ≤ |a|+|b|", "|a-b| ≥ ||a|-|b||", "a²+b² ≥ 2ab"],
+    "answer": 0
+  },
+  {
+    "question": "拉格朗日乘数法用于求什么？",
+    "options": ["无约束极值", "条件极值", "不定积分", "微分方程"],
+    "answer": 1
+  },
+  {
+    "question": "∫₀^∞ e^(-x) dx 等于？",
+    "options": ["0", "1", "∞", "e"],
+    "answer": 1
+  },
+  {
+    "question": "特征值方程是？",
+    "options": ["Ax=b", "Ax=λx", "A+B=C", "det(A)=0"],
+    "answer": 1
+  },
+  {
+    "question": "函数 y=ln(x) 的定义域是？",
+    "options": ["(-∞,+∞)", "(0,+∞)", "[0,+∞)", "(-∞,0)"],
+    "answer": 1
+  },
+  {
+    "question": "格林公式将什么联系起来？",
+    "options": ["曲线积分与二重积分", "三重积分与曲面积分", "级数与积分", "导数与极限"],
+    "answer": 0
+  },
+  {
+    "question": "散度 div(F) 的物理意义是？",
+    "options": ["旋转强度", "通量密度(源/汇)", "切线方向", "梯度大小"],
+    "answer": 1
+  },
+  {
+    "question": "等比级数 Σar^n 收敛的条件是？",
+    "options": ["|r|<1", "|r|>1", "r>0", "r<0"],
+    "answer": 0
+  },
+  {
+    "question": "Γ(n+1) 等于？(n为正整数)",
+    "options": ["n", "n!", "(n-1)!", "n^n"],
+    "answer": 1
+  },
+  {
+    "question": "傅里叶级数用于将函数分解为？",
+    "options": ["多项式之和", "指数函数之和", "正弦余弦之和", "对数之和"],
+    "answer": 2
+  },
+  {
+    "question": "微积分基本定理说明了什么关系？",
+    "options": ["极限与连续", "微分与积分互逆", "级数与函数", "矩阵与行列式"],
+    "answer": 1
+  }
+]

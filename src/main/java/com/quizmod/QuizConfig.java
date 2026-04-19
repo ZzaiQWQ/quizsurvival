@@ -1,3 +1,13 @@
+/*
+ * Quiz Survival Mod
+ * Copyright (c) 2026 oaoi
+ * https://github.com/ZzaiQWQ/quizsurvival
+ *
+ * This software is licensed under a custom non-commercial license.
+ * You may NOT sell or commercially distribute this software.
+ * You may NOT remove or alter this copyright notice.
+ * See LICENSE file for full terms.
+ */
 package com.quizmod;
 
 import com.google.gson.*;
@@ -14,6 +24,7 @@ public class QuizConfig {
     private static final Path CONFIG_FILE = FabricLoader.getInstance().getConfigDir().resolve("quizsurvival").resolve("quizsurvival_config.json");
 
     // ========== 基础设置 ==========
+    public String questionLanguage = "zh"; // 题库语言: zh=中文, en=英文
     public int freeActionCount = 5;
     public int freezeRadius = 32;
     public int quizTimeLimit = 30; // 答题倒计时(秒), 0=无限制
@@ -73,6 +84,7 @@ public class QuizConfig {
             try (Reader reader = Files.newBufferedReader(CONFIG_FILE, StandardCharsets.UTF_8)) {
                 JsonObject json = JsonParser.parseReader(reader).getAsJsonObject();
                 // 基础设置
+                if (json.has("questionLanguage")) config.questionLanguage = json.get("questionLanguage").getAsString();
                 if (json.has("freeActionCount")) config.freeActionCount = json.get("freeActionCount").getAsInt();
                 if (json.has("freezeRadius")) config.freezeRadius = json.get("freezeRadius").getAsInt();
                 if (json.has("quizTimeLimit")) config.quizTimeLimit = json.get("quizTimeLimit").getAsInt();
@@ -118,62 +130,65 @@ public class QuizConfig {
     public void save() {
         JsonObject json = new JsonObject();
 
-        // ===== 基础设置 =====
-        json.addProperty("_说明_基础", "===== 基础设置 =====");
+        // ===== 基础设置 / Basic Settings =====
+        json.addProperty("_section_basic", "===== 基础设置 / Basic Settings =====");
 
-        json.addProperty("_freeActionCount说明", "答对一题获得的免答操作次数");
+        json.addProperty("_questionLanguage", "题库语言: zh=中文, en=English / Question language: zh=Chinese, en=English. Delete quiz_questions_xx.json and /quizreload after changing");
+        json.addProperty("questionLanguage", questionLanguage);
+
+        json.addProperty("_freeActionCount", "答对获得的免答次数 / Free actions granted per correct answer");
         json.addProperty("freeActionCount", freeActionCount);
 
-        json.addProperty("_freezeRadius说明", "战斗答题时冻结周围怪物的范围(格)");
+        json.addProperty("_freezeRadius", "战斗答题时冻结周围怪物的范围(格) / Mob freeze radius during combat quiz (blocks)");
         json.addProperty("freezeRadius", freezeRadius);
 
-        json.addProperty("_quizTimeLimit说明", "答题倒计时秒数, 0表示无限制");
+        json.addProperty("_quizTimeLimit", "答题倒计时秒数, 0=无限制 / Quiz countdown in seconds, 0=unlimited");
         json.addProperty("quizTimeLimit", quizTimeLimit);
 
-        // ===== 答错惩罚 =====
-        json.addProperty("_说明_惩罚", "===== 答错惩罚设置 =====");
+        // ===== 答错惩罚 / Wrong Answer Penalty =====
+        json.addProperty("_section_penalty", "===== 答错惩罚 / Wrong Answer Penalty =====");
 
-        json.addProperty("_wrongDamageBase说明", "答错扣血底数, 公式: min(上限, 底数^连错次数), 第1次错扣1, 第2次扣2, 第3次扣4...");
+        json.addProperty("_wrongDamageBase", "答错扣血底数, 公式: min(上限, 底数^连错次数) / Wrong answer damage base, formula: min(max, base^consecutive_errors)");
         json.addProperty("wrongDamageBase", wrongDamageBase);
 
-        json.addProperty("_wrongDamageMax说明", "答错扣血上限, 无论错多少次最多扣这么多");
+        json.addProperty("_wrongDamageMax", "答错扣血上限 / Max damage per wrong answer");
         json.addProperty("wrongDamageMax", wrongDamageMax);
 
-        // ===== 战斗伤害 =====
-        json.addProperty("_说明_战斗伤害", "===== 战斗伤害设置 =====");
+        // ===== 战斗伤害 / Combat Damage =====
+        json.addProperty("_section_combat", "===== 战斗伤害 / Combat Damage =====");
 
-        json.addProperty("_smallMobHpThreshold说明", "小怪血量分界线, 最大血量<=此值的为小怪(默认20, 即僵尸/骷髅/苦力怕)");
+        json.addProperty("_smallMobHpThreshold", "小怪血量分界线, <=此值为小怪 / Small mob HP threshold, maxHP<=this is small mob (default 20: zombie/skeleton/creeper)");
         json.addProperty("smallMobHpThreshold", smallMobHpThreshold);
 
-        json.addProperty("_mediumMobHpThreshold说明", "中怪血量分界线, 最大血量<=此值的为中怪, >此值的为Boss(默认100)");
+        json.addProperty("_mediumMobHpThreshold", "中怪血量分界线, >此值为Boss / Medium mob HP threshold, maxHP>this is Boss (default 100)");
         json.addProperty("mediumMobHpThreshold", mediumMobHpThreshold);
 
-        json.addProperty("_meleeDamageSmall说明", "近战打小怪伤害倍率, 实际伤害=怪物最大血量*此值, 默认10即秒杀");
+        json.addProperty("_meleeDamageSmall", "近战小怪伤害倍率, 伤害=最大血量*此值, 10=秒杀 / Melee small mob damage multiplier, damage=maxHP*this, 10=one-shot");
         json.addProperty("meleeDamageSmall", meleeDamageSmall);
 
-        json.addProperty("_meleeDamageMedium说明", "近战打中怪伤害倍率, 实际伤害=怪物最大血量*此值, 默认0.5即半血");
+        json.addProperty("_meleeDamageMedium", "近战中怪伤害倍率, 0.5=半血 / Melee medium mob damage multiplier, 0.5=half HP");
         json.addProperty("meleeDamageMedium", meleeDamageMedium);
 
-        json.addProperty("_meleeDamageBoss说明", "近战打Boss固定伤害值(如末影龙/凋灵)");
+        json.addProperty("_meleeDamageBoss", "近战Boss固定伤害(如末影龙/凋灵) / Melee Boss fixed damage (e.g. Ender Dragon/Wither)");
         json.addProperty("meleeDamageBoss", meleeDamageBoss);
 
-        json.addProperty("_rangedDamageRatio说明", "弓箭伤害比例, 弓箭伤害=近战伤害*此值, 默认0.5即一半");
+        json.addProperty("_rangedDamageRatio", "弓箭伤害=近战伤害*此值, 0.5=一半 / Ranged damage = melee damage * this, 0.5=half");
         json.addProperty("rangedDamageRatio", rangedDamageRatio);
 
-        // ===== 效果设置 =====
-        json.addProperty("_说明_效果", "===== 答题期间效果设置 =====");
+        // ===== 效果设置 / Status Effects =====
+        json.addProperty("_section_effects", "===== 答题期间效果 / Quiz Status Effects =====");
 
-        json.addProperty("_effectDuration说明", "答题期间负面效果持续时间(tick), 20tick=1秒, 72000=1小时");
+        json.addProperty("_effectDuration", "负面效果持续时间(tick), 20tick=1秒, 72000=1小时 / Effect duration in ticks, 20ticks=1sec, 72000=1hour");
         json.addProperty("effectDuration", effectDuration);
 
-        json.addProperty("_slownessLevel说明", "缓慢效果等级, 0=I级, 1=II级, 5=VI级(几乎不能动)");
+        json.addProperty("_slownessLevel", "缓慢等级, 0=I级, 5=VI级 / Slowness level, 0=I, 5=VI (nearly immobile)");
         json.addProperty("slownessLevel", slownessLevel);
 
-        json.addProperty("_miningFatigueLevel说明", "挖掘疲劳等级, 255=最高(完全无法挖掘)");
+        json.addProperty("_miningFatigueLevel", "挖掘疲劳等级, 255=最高 / Mining Fatigue level, 255=max (cannot mine)");
         json.addProperty("miningFatigueLevel", miningFatigueLevel);
 
-        // ===== 方块分类 =====
-        json.addProperty("_说明_方块分类", "===== 方块分类(关键词匹配方块ID, 包含该关键词即归入对应分类) =====");
+        // ===== 方块分类 / Block Categories =====
+        json.addProperty("_section_blocks", "===== 方块分类(关键词匹配方块ID) / Block Categories (keyword matching block ID) =====");
 
         json.add("chopBlocks", toJsonArray(chopBlocks));
         json.add("oreBlocks", toJsonArray(oreBlocks));
@@ -182,8 +197,8 @@ public class QuizConfig {
         json.add("freeBlocks", toJsonArray(freeBlocks));
         json.add("interactBlocks", toJsonArray(interactBlocks));
 
-        // ===== 战斗排除 =====
-        json.addProperty("_说明_战斗排除", "===== 攻击以下实体时不触发答题(关键词匹配实体ID) =====");
+        // ===== 战斗排除 / Combat Exclusions =====
+        json.addProperty("_section_combat_exclude", "===== 攻击以下实体不触发答题 / Attacking these entities won't trigger quiz (keyword matching entity ID) =====");
         json.add("combatExcludeEntities", toJsonArray(combatExcludeEntities));
 
         try {

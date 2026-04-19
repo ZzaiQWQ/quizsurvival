@@ -4,11 +4,11 @@
   "version": "${version}",
   "name": "Quiz Survival",
   "description": "A survival mod where every action requires answering quiz questions. Supports mining, combat, jumping, interaction with configurable quiz system.",
-  "authors": ["MuJin"],
+  "authors": ["oaoi"],
   "contact": {
     "sources": "https://github.com/ZzaiQWQ/quizsurvival"
   },
-  "license": "MIT",
+  "license": "LicenseRef-QuizSurvival",
   "icon": "assets/quizsurvival/icon.png",
   "environment": "*",
   "entrypoints": {

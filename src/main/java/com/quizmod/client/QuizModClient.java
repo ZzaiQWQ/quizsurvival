@@ -1,3 +1,13 @@
+/*
+ * Quiz Survival Mod
+ * Copyright (c) 2026 oaoi
+ * https://github.com/ZzaiQWQ/quizsurvival
+ *
+ * This software is licensed under a custom non-commercial license.
+ * You may NOT sell or commercially distribute this software.
+ * You may NOT remove or alter this copyright notice.
+ * See LICENSE file for full terms.
+ */
 package com.quizmod.client;
 
 import com.quizmod.QuizPayloads;
@@ -24,6 +34,8 @@ public class QuizModClient implements ClientModInitializer {
                 // 用消息颜色判断音效：§c开头=答错，§a开头=答对
                 boolean isWrong = payload.message().startsWith("§c");
                 if (client.player != null) {
+                    // 显示消息到聊天栏
+                    client.player.sendMessage(net.minecraft.text.Text.literal(payload.message()), false);
                     if (isWrong) {
                         client.player.playSound(SoundEvents.ENTITY_VILLAGER_NO, 1.0f, 0.8f);
                     } else {

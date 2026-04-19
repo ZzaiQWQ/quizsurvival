@@ -1,0 +1,252 @@
+[
+  {
+    "question": "What is lim(x→0) sinx/x?",
+    "options": ["0", "1", "∞", "Does not exist"],
+    "answer": 1
+  },
+  {
+    "question": "What is the derivative of f(x)=e^x?",
+    "options": ["xe^(x-1)", "e^x", "e^(x-1)", "x·e^x"],
+    "answer": 1
+  },
+  {
+    "question": "What is ∫x²dx?",
+    "options": ["x³+C", "x³/3+C", "2x+C", "x²/2+C"],
+    "answer": 1
+  },
+  {
+    "question": "What is the derivative of sinx?",
+    "options": ["-cosx", "cosx", "-sinx", "tanx"],
+    "answer": 1
+  },
+  {
+    "question": "What is the derivative of lnx?",
+    "options": ["1/x", "x", "lnx", "e^x"],
+    "answer": 0
+  },
+  {
+    "question": "What is lim(n→∞) (1+1/n)^n?",
+    "options": ["1", "π", "e", "∞"],
+    "answer": 2
+  },
+  {
+    "question": "What is ∫(1/x)dx?",
+    "options": ["x²/2+C", "ln|x|+C", "-1/x²+C", "e^x+C"],
+    "answer": 1
+  },
+  {
+    "question": "What is the extremum of y=x³ at x=0?",
+    "options": ["Local maximum", "Local minimum", "Inflection point, not an extremum", "Not differentiable"],
+    "answer": 2
+  },
+  {
+    "question": "If f''(x)>0, the function is?",
+    "options": ["Monotonically increasing", "Monotonically decreasing", "Concave (curves down)", "Convex (curves up)"],
+    "answer": 3
+  },
+  {
+    "question": "What is ∫₀¹ x dx?",
+    "options": ["0", "1/2", "1", "2"],
+    "answer": 1
+  },
+  {
+    "question": "What is the derivative of tanx?",
+    "options": ["1/cos²x", "sec²x", "1+tan²x", "All of the above"],
+    "answer": 3
+  },
+  {
+    "question": "What is ∫e^x dx?",
+    "options": ["xe^x+C", "e^x+C", "e^(x+1)+C", "e^x/x+C"],
+    "answer": 1
+  },
+  {
+    "question": "What is the derivative of y=sin(2x)?",
+    "options": ["cos(2x)", "2cos(2x)", "-2cos(2x)", "2sin(2x)"],
+    "answer": 1
+  },
+  {
+    "question": "What is ∫cos(x)dx?",
+    "options": ["-sinx+C", "sinx+C", "cosx+C", "tanx+C"],
+    "answer": 1
+  },
+  {
+    "question": "What is lim(x→∞) 1/x?",
+    "options": ["1", "0", "∞", "Does not exist"],
+    "answer": 1
+  },
+  {
+    "question": "Is f(x)=|x| differentiable at x=0?",
+    "options": ["Differentiable", "Not differentiable but continuous", "Not continuous", "Differentiable with derivative 0"],
+    "answer": 1
+  },
+  {
+    "question": "What is ∫sin(x)dx?",
+    "options": ["cosx+C", "-cosx+C", "sinx+C", "-sinx+C"],
+    "answer": 1
+  },
+  {
+    "question": "L'Hôpital's rule applies to which type of limit?",
+    "options": ["0/0 or ∞/∞", "0×∞", "1^∞", "All of the above (with transformation)"],
+    "answer": 3
+  },
+  {
+    "question": "What is the slope of y=x² at (1,1)?",
+    "options": ["1", "2", "3", "1/2"],
+    "answer": 1
+  },
+  {
+    "question": "What is ∫₀^π sinx dx?",
+    "options": ["0", "1", "2", "π"],
+    "answer": 2
+  },
+  {
+    "question": "What is the antiderivative of y=1/x?",
+    "options": ["ln|x|+C", "-1/x²+C", "x²/2+C", "e^x+C"],
+    "answer": 0
+  },
+  {
+    "question": "What is the derivative of y=x^n?",
+    "options": ["nx^n", "nx^(n-1)", "(n-1)x^n", "x^(n+1)/(n+1)"],
+    "answer": 1
+  },
+  {
+    "question": "Which is the Maclaurin series for e^x?",
+    "options": ["Σ x^n/n!", "Σ x^n/n", "Σ nx^n", "Σ x^n"],
+    "answer": 0
+  },
+  {
+    "question": "What is the partial derivative ∂(xy²)/∂x?",
+    "options": ["2xy", "y²", "xy", "x²y"],
+    "answer": 1
+  },
+  {
+    "question": "What is the general solution of y'=y?",
+    "options": ["y=Cx", "y=Ce^x", "y=C/x", "y=Cx²"],
+    "answer": 1
+  },
+  {
+    "question": "If det(A) = 0, matrix A is?",
+    "options": ["Invertible", "Singular (non-invertible)", "Positive definite", "Symmetric"],
+    "answer": 1
+  },
+  {
+    "question": "What is ∬dxdy over the unit circle?",
+    "options": ["π", "2π", "1", "4"],
+    "answer": 0
+  },
+  {
+    "question": "The harmonic series Σ(1/n) (n=1 to ∞) is?",
+    "options": ["Convergent", "Divergent", "Conditionally convergent", "Absolutely convergent"],
+    "answer": 1
+  },
+  {
+    "question": "What is ∫₁^e (1/x)dx?",
+    "options": ["0", "1", "e", "1/e"],
+    "answer": 1
+  },
+  {
+    "question": "The gradient ∇f points in which direction?",
+    "options": ["Steepest descent", "Steepest ascent", "Along level curves", "Random direction"],
+    "answer": 1
+  },
+  {
+    "question": "What is the first term of sinx expanded at x=0?",
+    "options": ["1", "x", "x²", "x³"],
+    "answer": 1
+  },
+  {
+    "question": "A continuous function on a closed interval must have?",
+    "options": ["A derivative", "Maximum and minimum values", "An antiderivative", "An inflection point"],
+    "answer": 1
+  },
+  {
+    "question": "What shape is the graph of y=e^(-x²)?",
+    "options": ["Straight line", "Parabola", "Bell curve", "Hyperbola"],
+    "answer": 2
+  },
+  {
+    "question": "What is ∫₋₁¹ x³ dx?",
+    "options": ["0", "1/4", "2/3", "1"],
+    "answer": 0
+  },
+  {
+    "question": "Is matrix multiplication commutative?",
+    "options": ["Yes", "Generally no", "Only for square matrices", "Only for diagonal matrices"],
+    "answer": 1
+  },
+  {
+    "question": "For x²+y²=1, what is dy/dx?",
+    "options": ["x/y", "-x/y", "y/x", "-y/x"],
+    "answer": 1
+  },
+  {
+    "question": "What method is used for ∫x·e^x dx?",
+    "options": ["Substitution", "Integration by parts", "Partial fractions", "Direct integration"],
+    "answer": 1
+  },
+  {
+    "question": "The Mean Value Theorem requires the function to be?",
+    "options": ["Differentiable", "Continuous", "Continuous on [a,b], differentiable on (a,b)", "Differentiable everywhere"],
+    "answer": 2
+  },
+  {
+    "question": "What is the cross product of (1,0,0) and (0,1,0)?",
+    "options": ["(0,0,1)", "(0,0,-1)", "(1,1,0)", "0"],
+    "answer": 0
+  },
+  {
+    "question": "What is the Cauchy-Schwarz inequality?",
+    "options": ["|a·b| ≤ |a|·|b|", "|a+b| ≤ |a|+|b|", "|a-b| ≥ ||a|-|b||", "a²+b² ≥ 2ab"],
+    "answer": 0
+  },
+  {
+    "question": "Lagrange multipliers are used to find?",
+    "options": ["Unconstrained extrema", "Constrained extrema", "Indefinite integrals", "Differential equations"],
+    "answer": 1
+  },
+  {
+    "question": "What is ∫₀^∞ e^(-x) dx?",
+    "options": ["0", "1", "∞", "e"],
+    "answer": 1
+  },
+  {
+    "question": "What is the eigenvalue equation?",
+    "options": ["Ax=b", "Ax=λx", "A+B=C", "det(A)=0"],
+    "answer": 1
+  },
+  {
+    "question": "What is the domain of y=ln(x)?",
+    "options": ["(-∞,+∞)", "(0,+∞)", "[0,+∞)", "(-∞,0)"],
+    "answer": 1
+  },
+  {
+    "question": "Green's theorem connects?",
+    "options": ["Line integrals and double integrals", "Triple integrals and surface integrals", "Series and integrals", "Derivatives and limits"],
+    "answer": 0
+  },
+  {
+    "question": "What is the physical meaning of divergence div(F)?",
+    "options": ["Rotation strength", "Flux density (source/sink)", "Tangent direction", "Gradient magnitude"],
+    "answer": 1
+  },
+  {
+    "question": "A geometric series Σar^n converges when?",
+    "options": ["|r|<1", "|r|>1", "r>0", "r<0"],
+    "answer": 0
+  },
+  {
+    "question": "What is Γ(n+1) for positive integer n?",
+    "options": ["n", "n!", "(n-1)!", "n^n"],
+    "answer": 1
+  },
+  {
+    "question": "Fourier series decomposes a function into?",
+    "options": ["Sum of polynomials", "Sum of exponentials", "Sum of sines and cosines", "Sum of logarithms"],
+    "answer": 2
+  },
+  {
+    "question": "The Fundamental Theorem of Calculus establishes?",
+    "options": ["Limits and continuity", "Differentiation and integration are inverse", "Series and functions", "Matrices and determinants"],
+    "answer": 1
+  }
+]

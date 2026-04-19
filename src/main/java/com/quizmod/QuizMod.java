@@ -1,3 +1,13 @@
+/*
+ * Quiz Survival Mod
+ * Copyright (c) 2026 oaoi
+ * https://github.com/ZzaiQWQ/quizsurvival
+ *
+ * This software is licensed under a custom non-commercial license.
+ * You may NOT sell or commercially distribute this software.
+ * You may NOT remove or alter this copyright notice.
+ * See LICENSE file for full terms.
+ */
 package com.quizmod;
 
 import net.fabricmc.api.ModInitializer;
@@ -46,6 +56,11 @@ public class QuizMod implements ModInitializer {
     private static final Map<UUID, Boolean> isRangedCombat = new ConcurrentHashMap<>();
     // 答题开始时间(用于倒计时超时)
     private static final Map<UUID, Long> quizStartTime = new ConcurrentHashMap<>();
+
+    /** 当前配置是否为英文 */
+    private static boolean isEn() {
+        return config != null && "en".equals(config.questionLanguage);
+    }
 
     /** 根据方块ID判断属于哪个分类（从配置文件读取） */
     private static String getBlockCategory(String blockId) {
@@ -107,38 +122,46 @@ public class QuizMod implements ModInitializer {
                                     damage = maxHp * config.meleeDamageSmall;
                                     if (rangedFlag) damage *= config.rangedDamageRatio;
                                     if (damage >= le.getHealth() && !rangedFlag) {
-                                        msg = "§a✔ 回答正确！一击必杀！";
+                                        msg = isEn() ? "§a✔ Correct! One-hit kill!" : "§a✔ 回答正确！一击必杀！";
                                     } else {
-                                        msg = "§a✔ 回答正确！" + (rangedFlag ? "弓箭" : "近战") + "造成 " + (int) damage + " 点伤害！(剩余 "
-                                                + (int) Math.max(0, le.getHealth() - damage) + ")";
+                                        String atkType = isEn() ? (rangedFlag ? "Ranged" : "Melee") : (rangedFlag ? "弓箭" : "近战");
+                                        int remaining = (int) Math.max(0, le.getHealth() - damage);
+                                        msg = isEn()
+                                            ? "§a✔ Correct! " + atkType + " dealt " + (int) damage + " damage! (" + remaining + " left)"
+                                            : "§a✔ 回答正确！" + atkType + "造成 " + (int) damage + " 点伤害！(剩余 " + remaining + ")";
                                     }
                                 } else if (maxHp <= config.mediumMobHpThreshold) {
                                     damage = maxHp * config.meleeDamageMedium;
                                     if (rangedFlag) damage *= config.rangedDamageRatio;
-                                    msg = "§a✔ 回答正确！对怪物造成 " + (int) damage + " 点伤害！(剩余 "
-                                            + (int) Math.max(0, le.getHealth() - damage) + ")";
+                                    int rem = (int) Math.max(0, le.getHealth() - damage);
+                                    msg = isEn()
+                                        ? "§a✔ Correct! Dealt " + (int) damage + " damage! (" + rem + " left)"
+                                        : "§a✔ 回答正确！对怪物造成 " + (int) damage + " 点伤害！(剩余 " + rem + ")";
                                 } else {
                                     damage = config.meleeDamageBoss;
                                     if (rangedFlag) damage *= config.rangedDamageRatio;
-                                    msg = "§a✔ 回答正确！对Boss造成 " + (int) damage + " 点伤害！(剩余 "
-                                            + (int) Math.max(0, le.getHealth() - damage) + ")";
+                                    int rem = (int) Math.max(0, le.getHealth() - damage);
+                                    msg = isEn()
+                                        ? "§a✔ Correct! Dealt " + (int) damage + " to Boss! (" + rem + " left)"
+                                        : "§a✔ 回答正确！对Boss造成 " + (int) damage + " 点伤害！(剩余 " + rem + ")";
                                 }
                                 ServerWorld sw = (ServerWorld) le.getEntityWorld();
                                 le.damage(sw, player.getDamageSources().playerAttack(player), damage);
                                 ServerPlayNetworking.send(player, new QuizPayloads.QuizResultS2C(true, msg));
                             } else {
                                 ServerPlayNetworking.send(player,
-                                        new QuizPayloads.QuizResultS2C(true, "§a✔ 回答正确！目标已消失"));
+                                        new QuizPayloads.QuizResultS2C(true, isEn() ? "§a✔ Correct! Target gone" : "§a✔ 回答正确！目标已消失"));
                             }
                         } else {
                             int count = config.freeActionCount;
                             quizManager.grantActions(player.getUuid(), type, count);
                             ServerPlayNetworking.send(player, new QuizPayloads.QuizResultS2C(true,
-                                    "§a✔ 回答正确！获得 " + count + " 次免答机会！"));
+                                    isEn() ? "§a✔ Correct! " + count + " free actions granted!"
+                                           : "§a✔ 回答正确！获得 " + count + " 次免答机会！"));
                         }
                         syncActions(player);
                     } else {
-                        ServerPlayNetworking.send(player, new QuizPayloads.QuizResultS2C(true, "§a✔ 回答正确！"));
+                        ServerPlayNetworking.send(player, new QuizPayloads.QuizResultS2C(true, isEn() ? "§a✔ Correct!" : "§a✔ 回答正确！"));
                     }
                 } else {
                     // 答错
@@ -157,12 +180,13 @@ public class QuizMod implements ModInitializer {
                         isRangedCombat.remove(player.getUuid());
                         if (target instanceof CreeperEntity creeper && creeper.isAlive()) {
                             creeper.ignite();
-                            ServerPlayNetworking.send(player, new QuizPayloads.QuizResultS2C(true,
-                                    "§c✘ 回答错误！苦力怕开始爆炸！快跑！"));
+                            ServerPlayNetworking.send(player, new QuizPayloads.QuizResultS2C(false,
+                                    isEn() ? "§c✘ Wrong! Creeper ignited! RUN!" : "§c✘ 回答错误！苦力怕开始爆炸！快跑！"));
                             pendingQuizType.remove(player.getUuid());
                         } else {
-                            ServerPlayNetworking.send(player, new QuizPayloads.QuizResultS2C(true,
-                                    "§c✘ 回答错误！怪物已解冻！扣除 " + (int) damage + " 点血！"));
+                            ServerPlayNetworking.send(player, new QuizPayloads.QuizResultS2C(false,
+                                    isEn() ? "§c✘ Wrong! Mobs unfrozen! -" + (int) damage + " HP!"
+                                           : "§c✘ 回答错误！怪物已解冻！扣除 " + (int) damage + " 点血！"));
                             float newHealth = player.getHealth() - damage;
                             player.setHealth(Math.max(0.0f, newHealth));
                             pendingQuizType.remove(player.getUuid());
@@ -174,11 +198,13 @@ public class QuizMod implements ModInitializer {
                         LOGGER.info("[答题生存] 玩家 {} 第{}次答错，扣{}血，剩余: {}",
                                 player.getName().getString(), wc + 1, damage, Math.max(0, newHealth));
                         if (newHealth <= 0) {
-                            ServerPlayNetworking.send(player, new QuizPayloads.QuizResultS2C(true,
-                                    "§c✘ 回答错误！扣除 " + (int) damage + " 点血！你死了！"));
+                            ServerPlayNetworking.send(player, new QuizPayloads.QuizResultS2C(false,
+                                    isEn() ? "§c✘ Wrong! -" + (int) damage + " HP! You died!"
+                                           : "§c✘ 回答错误！扣除 " + (int) damage + " 点血！你死了！"));
                         } else {
                             ServerPlayNetworking.send(player, new QuizPayloads.QuizResultS2C(false,
-                                    "§c✘ 回答错误！扣除 " + (int) damage + " 点血！剩余 " + (int) newHealth + " 点！"));
+                                    isEn() ? "§c✘ Wrong! -" + (int) damage + " HP! (" + (int) newHealth + " left)"
+                                           : "§c✘ 回答错误！扣除 " + (int) damage + " 点血！剩余 " + (int) newHealth + " 点！"));
                             sendQuiz(player);
                         }
                     }
@@ -318,17 +344,20 @@ public class QuizMod implements ModInitializer {
                             isRangedCombat.remove(uuid);
                             pendingQuizType.remove(uuid);
                             ServerPlayNetworking.send(sp, new QuizPayloads.QuizResultS2C(true,
-                                    "§c✘ 答题超时！怪物已解冻！扣除 " + (int) damage + " 点血！"));
+                                    isEn() ? "§c✘ Time's up! Mobs unfrozen! -" + (int) damage + " HP!"
+                                           : "§c✘ 答题超时！怪物已解冻！扣除 " + (int) damage + " 点血！"));
                             sp.setHealth(Math.max(0.0f, sp.getHealth() - damage));
                         } else {
                             float newHealth = sp.getHealth() - damage;
                             sp.setHealth(Math.max(0.0f, newHealth));
                             if (newHealth <= 0) {
                                 ServerPlayNetworking.send(sp, new QuizPayloads.QuizResultS2C(true,
-                                        "§c✘ 答题超时！扣除 " + (int) damage + " 点血！你死了！"));
+                                        isEn() ? "§c✘ Time's up! -" + (int) damage + " HP! You died!"
+                                               : "§c✘ 答题超时！扣除 " + (int) damage + " 点血！你死了！"));
                             } else {
                                 ServerPlayNetworking.send(sp, new QuizPayloads.QuizResultS2C(false,
-                                        "§c✘ 答题超时！扣除 " + (int) damage + " 点血！"));
+                                        isEn() ? "§c✘ Time's up! -" + (int) damage + " HP!"
+                                               : "§c✘ 答题超时！扣除 " + (int) damage + " 点血！"));
                                 sendQuiz(sp);
                             }
                         }
@@ -339,80 +368,131 @@ public class QuizMod implements ModInitializer {
             }
         });
 
-        // 注册命令
+        // 注册命令: /quizsurvival <子命令>
         CommandRegistrationCallback.EVENT.register((dispatcher, registryAccess, environment) -> {
-            // /quizreload - 热重载题库和配置
-            dispatcher.register(CommandManager.literal("quizreload")
-                    .requires(src -> {
-                        try {
-                            var player = src.getPlayerOrThrow();
-                            return src.getServer().getPlayerManager().isOperator(
-                                    new net.minecraft.server.PlayerConfigEntry(player.getGameProfile()));
-                        } catch (Exception e) {
-                            return false;
-                        }
-                    })
+            dispatcher.register(CommandManager.literal("quizsurvival")
+                    // /quizsurvival help - 显示帮助
                     .executes(ctx -> {
-                        config = QuizConfig.load();
-                        int count = quizManager.reload();
+                        boolean en = isEn();
                         ctx.getSource().sendFeedback(() -> Text.literal(
-                                "§a[答题生存] 配置和题库已重载！当前共 " + count + " 道题目，倒计时 " + config.quizTimeLimit + " 秒"),
-                                true);
-                        return 1;
-                    }));
-
-            // /quizstats [玩家] - 查看答题统计
-            dispatcher.register(CommandManager.literal("quizstats")
-                    .executes(ctx -> {
-                        if (ctx.getSource().getPlayer() != null) {
-                            showStats(ctx.getSource().getPlayer(), ctx.getSource().getPlayer());
-                        }
+                                en ? "§e§l===== Quiz Survival Commands =====\n"
+                                        + "§a/quizsurvival reload §7- Reload config & questions\n"
+                                        + "§a/quizsurvival stats [player] §7- View quiz statistics\n"
+                                        + "§a/quizsurvival time <seconds> §7- Set quiz timer (0=off)\n"
+                                        + "§a/quizsurvival lang <zh|en> §7- Switch question language"
+                                   : "§e§l===== 答题生存 指令帮助 =====\n"
+                                        + "§a/quizsurvival reload §7- 重载配置和题库\n"
+                                        + "§a/quizsurvival stats [玩家] §7- 查看答题统计\n"
+                                        + "§a/quizsurvival time <秒数> §7- 设置倒计时(0=关闭)\n"
+                                        + "§a/quizsurvival lang <zh|en> §7- 切换题库语言"
+                        ), false);
                         return 1;
                     })
-                    .then(CommandManager.argument("player", net.minecraft.command.argument.EntityArgumentType.player())
+                    // /quizsurvival reload - 热重载
+                    .then(CommandManager.literal("reload")
+                            .requires(src -> {
+                                try {
+                                    var player = src.getPlayerOrThrow();
+                                    return src.getServer().getPlayerManager().isOperator(
+                                            new net.minecraft.server.PlayerConfigEntry(player.getGameProfile()));
+                                } catch (Exception e) {
+                                    return false;
+                                }
+                            })
                             .executes(ctx -> {
-                                ServerPlayerEntity target = net.minecraft.command.argument.EntityArgumentType
-                                        .getPlayer(ctx, "player");
-                                showStats(ctx.getSource().getPlayer(), target);
+                                config = QuizConfig.load();
+                                int count = quizManager.reload();
+                                String feedback = isEn()
+                                        ? "§a[Quiz Survival] Config & questions reloaded! " + count + " questions, timer: " + config.quizTimeLimit + "s"
+                                        : "§a[答题生存] 配置和题库已重载！当前共 " + count + " 道题目，倒计时 " + config.quizTimeLimit + " 秒";
+                                ctx.getSource().sendFeedback(() -> Text.literal(feedback), true);
                                 return 1;
-                            })));
-
-            // /quiztime <秒数> - 修改答题倒计时
-            dispatcher.register(CommandManager.literal("quiztime")
-                    .requires(src -> {
-                        try {
-                            var p = src.getPlayerOrThrow();
-                            return src.getServer().getPlayerManager().isOperator(
-                                    new net.minecraft.server.PlayerConfigEntry(p.getGameProfile()));
-                        } catch (Exception e) {
-                            return false;
-                        }
-                    })
-                    .then(CommandManager
-                            .argument("seconds", com.mojang.brigadier.arguments.IntegerArgumentType.integer(0, 300))
+                            }))
+                    // /quizsurvival stats [player] - 答题统计
+                    .then(CommandManager.literal("stats")
                             .executes(ctx -> {
-                                int seconds = com.mojang.brigadier.arguments.IntegerArgumentType.getInteger(ctx,
-                                        "seconds");
-                                config.quizTimeLimit = seconds;
-                                config.save();
-                                String msg = seconds == 0
-                                        ? "§a[答题生存] 已关闭答题倒计时！"
-                                        : "§a[答题生存] 答题倒计时已设为 " + seconds + " 秒！";
-                                ctx.getSource().sendFeedback(() -> Text.literal(msg), true);
+                                if (ctx.getSource().getPlayer() != null) {
+                                    showStats(ctx.getSource().getPlayer(), ctx.getSource().getPlayer());
+                                }
                                 return 1;
-                            })));
+                            })
+                            .then(CommandManager.argument("player", net.minecraft.command.argument.EntityArgumentType.player())
+                                    .executes(ctx -> {
+                                        ServerPlayerEntity target = net.minecraft.command.argument.EntityArgumentType
+                                                .getPlayer(ctx, "player");
+                                        showStats(ctx.getSource().getPlayer(), target);
+                                        return 1;
+                                    })))
+                    // /quizsurvival time <seconds> - 修改倒计时
+                    .then(CommandManager.literal("time")
+                            .requires(src -> {
+                                try {
+                                    var p = src.getPlayerOrThrow();
+                                    return src.getServer().getPlayerManager().isOperator(
+                                            new net.minecraft.server.PlayerConfigEntry(p.getGameProfile()));
+                                } catch (Exception e) {
+                                    return false;
+                                }
+                            })
+                            .then(CommandManager
+                                    .argument("seconds", com.mojang.brigadier.arguments.IntegerArgumentType.integer(0, 300))
+                                    .executes(ctx -> {
+                                        int seconds = com.mojang.brigadier.arguments.IntegerArgumentType.getInteger(ctx,
+                                                "seconds");
+                                        config.quizTimeLimit = seconds;
+                                        config.save();
+                                        String msg;
+                                        if (isEn()) {
+                                            msg = seconds == 0 ? "§a[Quiz Survival] Timer disabled!" : "§a[Quiz Survival] Timer set to " + seconds + "s!";
+                                        } else {
+                                            msg = seconds == 0 ? "§a[答题生存] 已关闭答题倒计时！" : "§a[答题生存] 答题倒计时已设为 " + seconds + " 秒！";
+                                        }
+                                        ctx.getSource().sendFeedback(() -> Text.literal(msg), true);
+                                        return 1;
+                                    })))
+                    // /quizsurvival lang <zh|en> - 切换语言
+                    .then(CommandManager.literal("lang")
+                            .requires(src -> {
+                                try {
+                                    var p = src.getPlayerOrThrow();
+                                    return src.getServer().getPlayerManager().isOperator(
+                                            new net.minecraft.server.PlayerConfigEntry(p.getGameProfile()));
+                                } catch (Exception e) {
+                                    return false;
+                                }
+                            })
+                            .then(CommandManager.literal("zh").executes(ctx -> switchLang(ctx, "zh")))
+                            .then(CommandManager.literal("en").executes(ctx -> switchLang(ctx, "en"))))
+            );
         });
 
         LOGGER.info("[答题生存] 已加载 {} 道题目！倒计时 {} 秒", quizManager.getQuestionCount(), config.quizTimeLimit);
     }
 
+    private static int switchLang(com.mojang.brigadier.context.CommandContext<net.minecraft.server.command.ServerCommandSource> ctx, String lang) {
+        config.questionLanguage = lang;
+        config.save();
+        int count = quizManager.reload();
+        String feedback = "en".equals(lang)
+                ? "§a[Quiz Survival] Language switched to English! " + count + " questions loaded"
+                : "§a[答题生存] 语言已切换为中文！已加载 " + count + " 道题目";
+        ctx.getSource().sendFeedback(() -> Text.literal(feedback), true);
+        return 1;
+    }
+
     private static void showStats(ServerPlayerEntity viewer, ServerPlayerEntity target) {
         int[] stats = quizManager.getStats(target.getUuid());
         String rate = stats[0] > 0 ? String.format("%.1f%%", stats[1] * 100.0 / stats[0]) : "N/A";
-        viewer.sendMessage(Text.literal(
-                "§e§l===== 答题统计: §f" + target.getName().getString() + " §e§l====="));
-        viewer.sendMessage(Text.literal(
-                "§7总答题: §f" + stats[0] + " §7| 正确: §a" + stats[1] + " §7| 错误: §c" + stats[2] + " §7| 正确率: §b" + rate));
+        String name = target.getName().getString();
+        if (isEn()) {
+            viewer.sendMessage(Text.literal("§e§l===== Quiz Stats: §f" + name + " §e§l====="));
+            viewer.sendMessage(Text.literal(
+                    "§7Total: §f" + stats[0] + " §7| Correct: §a" + stats[1] + " §7| Wrong: §c" + stats[2] + " §7| Rate: §b" + rate));
+        } else {
+            viewer.sendMessage(Text.literal("§e§l===== 答题统计: §f" + name + " §e§l====="));
+            viewer.sendMessage(Text.literal(
+                    "§7总答题: §f" + stats[0] + " §7| 正确: §a" + stats[1] + " §7| 错误: §c" + stats[2] + " §7| 正确率: §b" + rate));
+        }
     }
 
     public static void triggerQuiz(ServerPlayerEntity player, String type) {
@@ -420,7 +500,7 @@ public class QuizMod implements ModInitializer {
         player.addStatusEffect(new StatusEffectInstance(StatusEffects.MINING_FATIGUE, config.effectDuration, config.miningFatigueLevel, false, false));
         player.addStatusEffect(new StatusEffectInstance(StatusEffects.SLOWNESS, config.effectDuration, config.slownessLevel, false, false));
         player.addStatusEffect(new StatusEffectInstance(StatusEffects.WEAKNESS, config.effectDuration, 255, false, false));
-        player.sendMessage(Text.literal("§e§l⚠ 请完成答题后继续游戏！"), true);
+        player.sendMessage(Text.literal(isEn() ? "§e§l⚠ Complete the quiz to continue!" : "§e§l⚠ 请完成答题后继续游戏！"), true);
         sendQuiz(player);
     }
 
@@ -437,16 +517,17 @@ public class QuizMod implements ModInitializer {
     }
 
     public static String getTypeName(String type) {
+        boolean en = config != null && "en".equals(config.questionLanguage);
         return switch (type) {
-            case "chop" -> "§a[砍伐]§r 木头";
-            case "ore" -> "§b[挖掘]§r 矿物";
-            case "stone" -> "§7[挖掘]§r 石头";
-            case "dirt" -> "§6[挖掘]§r 泥土";
-            case "interact" -> "§d[交互]§r 方块";
-            case "combat" -> "§c[战斗]§r 攻击";
-            case "jump" -> "§3[跳跃]§r 跳跃";
-            case "other" -> "§f[挖掘]§r 方块";
-            default -> "§f[未知]§r " + type;
+            case "chop" -> en ? "§a[Chop]§r Wood" : "§a[砍伐]§r 木头";
+            case "ore" -> en ? "§b[Mine]§r Ore" : "§b[挖掘]§r 矿物";
+            case "stone" -> en ? "§7[Mine]§r Stone" : "§7[挖掘]§r 石头";
+            case "dirt" -> en ? "§6[Mine]§r Dirt" : "§6[挖掘]§r 泥土";
+            case "interact" -> en ? "§d[Interact]§r Block" : "§d[交互]§r 方块";
+            case "combat" -> en ? "§c[Combat]§r Attack" : "§c[战斗]§r 攻击";
+            case "jump" -> en ? "§3[Jump]§r Jump" : "§3[跳跃]§r 跳跃";
+            case "other" -> en ? "§f[Mine]§r Block" : "§f[挖掘]§r 方块";
+            default -> "§f[?]§r " + type;
         };
     }
 

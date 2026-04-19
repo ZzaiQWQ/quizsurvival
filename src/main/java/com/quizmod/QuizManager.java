@@ -1,3 +1,13 @@
+/*
+ * Quiz Survival Mod
+ * Copyright (c) 2026 oaoi
+ * https://github.com/ZzaiQWQ/quizsurvival
+ *
+ * This software is licensed under a custom non-commercial license.
+ * You may NOT sell or commercially distribute this software.
+ * You may NOT remove or alter this copyright notice.
+ * See LICENSE file for full terms.
+ */
 package com.quizmod;
 
 import com.google.gson.*;
@@ -11,7 +21,12 @@ import java.util.*;
 
 public class QuizManager {
     private static final org.slf4j.Logger LOGGER = LoggerFactory.getLogger("quizsurvival");
-    private static final Path QUESTIONS_FILE = FabricLoader.getInstance().getConfigDir().resolve("quizsurvival").resolve("quiz_questions.json");
+    private static final Path CONFIG_DIR = FabricLoader.getInstance().getConfigDir().resolve("quizsurvival");
+
+    private static Path getQuestionsFile() {
+        String lang = QuizMod.config != null ? QuizMod.config.questionLanguage : "zh";
+        return CONFIG_DIR.resolve("quiz_questions_" + lang + ".json");
+    }
 
     private final List<Question> questions = new ArrayList<>();
     private final Map<UUID, Integer> activeQuizzes = new java.util.concurrent.ConcurrentHashMap<>();
@@ -21,16 +36,17 @@ public class QuizManager {
     private final Map<UUID, List<Question>> playerQueues = new java.util.concurrent.ConcurrentHashMap<>();
 
     public QuizManager() {
-        if (Files.exists(QUESTIONS_FILE)) {
-            loadFromJson();
+        Path file = getQuestionsFile();
+        if (Files.exists(file)) {
+            loadFromJson(file);
         } else {
             loadQuestions(); // 硬编码默认题库
-            saveToJson();   // 首次运行生成JSON
+            saveToJson(file);   // 首次运行生成JSON
         }
     }
 
-    private void loadFromJson() {
-        try (Reader r = Files.newBufferedReader(QUESTIONS_FILE, StandardCharsets.UTF_8)) {
+    private void loadFromJson(Path file) {
+        try (Reader r = Files.newBufferedReader(file, StandardCharsets.UTF_8)) {
             for (JsonElement el : JsonParser.parseReader(r).getAsJsonArray()) {
                 JsonObject o = el.getAsJsonObject();
                 List<String> opts = new ArrayList<>();
@@ -44,7 +60,7 @@ public class QuizManager {
         }
     }
 
-    private void saveToJson() {
+    private void saveToJson(Path file) {
         JsonArray arr = new JsonArray();
         for (Question q : questions) {
             JsonObject o = new JsonObject();
@@ -56,9 +72,9 @@ public class QuizManager {
             arr.add(o);
         }
         try {
-            Files.createDirectories(QUESTIONS_FILE.getParent());
-            Files.writeString(QUESTIONS_FILE, new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create().toJson(arr), StandardCharsets.UTF_8);
-            LOGGER.info("[答题生存] 已生成题库JSON: {}", QUESTIONS_FILE);
+            Files.createDirectories(file.getParent());
+            Files.writeString(file, new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create().toJson(arr), StandardCharsets.UTF_8);
+            LOGGER.info("[答题生存] 已生成题库JSON: {}", file);
         } catch (Exception e) {
             LOGGER.error("[答题生存] 题库JSON保存失败", e);
         }
@@ -147,16 +163,26 @@ public class QuizManager {
     public int reload() {
         questions.clear();
         playerQueues.clear();
-        if (Files.exists(QUESTIONS_FILE)) {
-            loadFromJson();
+        Path file = getQuestionsFile();
+        if (Files.exists(file)) {
+            loadFromJson(file);
         } else {
             loadQuestions();
-            saveToJson();
+            saveToJson(file);
         }
         return questions.size();
     }
 
     private void loadQuestions() {
+        String lang = QuizMod.config != null ? QuizMod.config.questionLanguage : "zh";
+        if ("en".equals(lang)) {
+            loadQuestionsEn();
+        } else {
+            loadQuestionsZh();
+        }
+    }
+
+    private void loadQuestionsZh() {
         q("钻石矿最低可以在第几层生成？", List.of("-64层","0层","16层","32层"), 0);
         q("至少需要什么镐子才能挖铁矿？", List.of("木镐","石镐","铁镐","钻石镐"), 1);
         q("一组方块最多堆叠多少个？", List.of("16个","32个","64个","128个"), 2);
@@ -358,6 +384,211 @@ public class QuizManager {
         q("刷怪笼能用精准采集挖吗？", List.of("可以","不可以","只在创造模式","看版本"), 1);
         q("猫用什么驯服？", List.of("骨头","肉","生鱼","种子"), 2);
         q("村民晚上会做什么？", List.of("继续工作","回家睡觉","消失","变成僵尸"), 1);
+    }
+
+    private void loadQuestionsEn() {
+        // === Mining & Ores ===
+        q("What is the lowest Y level where diamonds can generate?", List.of("Y=-64","Y=0","Y=16","Y=32"), 0);
+        q("What is the minimum pickaxe required to mine iron ore?", List.of("Wooden","Stone","Iron","Diamond"), 1);
+        q("What is the max stack size for most blocks?", List.of("16","32","64","128"), 2);
+        q("Which dimension is the Ender Dragon in?", List.of("Overworld","Nether","The End","Deep Dark"), 2);
+        q("What ore yields Netherite Scrap?", List.of("Ancient Debris","Blackstone","Basalt","Magma Block"), 0);
+        q("What item is needed to activate a Beacon?", List.of("Diamond","Nether Star","Eye of Ender","Golden Apple"), 1);
+        q("Which mob drops Gunpowder?", List.of("Zombie","Skeleton","Creeper","Spider"), 2);
+        q("How many bookshelves for max enchanting?", List.of("10","12","15","20"), 2);
+        q("What blocks are used to build an Iron Golem?", List.of("Iron Blocks","Gold Blocks","Diamond Blocks","Copper Blocks"), 0);
+        q("How many Wither Skeleton Skulls to summon the Wither?", List.of("1","2","3","4"), 2);
+        q("How many real-life seconds is one MC day?", List.of("600","1200","1800","2400"), 1);
+        q("Where can Shulkers be found?", List.of("Nether Fortress","End City","Ocean Monument","Woodland Mansion"), 1);
+        q("How far can a Redstone signal travel?", List.of("10 blocks","12 blocks","15 blocks","20 blocks"), 2);
+        q("How many planks to craft a Crafting Table?", List.of("2","4","6","8"), 1);
+        q("How many iron ingots to craft an Iron Sword?", List.of("2","3","4","5"), 0);
+        q("What happens when a Villager is struck by lightning?", List.of("Zombie Villager","Skeleton","Pillager","Witch"), 3);
+        q("What is the minimum pickaxe for Obsidian?", List.of("Stone","Iron","Gold","Diamond"), 3);
+        q("How many strings to craft a Bow?", List.of("1","2","3","4"), 2);
+        q("How many iron ingots make an Iron Block?", List.of("3","4","6","9"), 3);
+        q("What happens to Zombies in sunlight?", List.of("Burn","Speed up","Turn invisible","Nothing"), 0);
+        q("What is the max stack size for Eggs?", List.of("8","16","32","64"), 1);
+        q("How many gold ingots for a Golden Apple?", List.of("2","4","6","8"), 3);
+        q("What does a Pig turn into when struck by lightning?", List.of("Piglin","Skeleton Horse","Zombified Piglin","Hoglin"), 2);
+        q("Which mob drops the Trident?", List.of("Guardian","Drowned","Elder Guardian","Enderman"), 1);
+        q("What happens when you use a Bed in the Nether?", List.of("Sleep normally","Cannot use","Explodes","Teleports to Overworld"), 2);
+        q("Which pickaxe has the fastest mining speed?", List.of("Gold","Diamond","Iron","Netherite"), 0);
+        q("What does Stone drop when mined with a pickaxe?", List.of("Cobblestone","Gravel","Crushed Stone","Dirt"), 0);
+        q("Can Zombie Villagers be cured?", List.of("Yes","No","Only on Hard mode","Only on Peaceful"), 0);
+        q("In which biome does Emerald Ore generate?", List.of("Mountains","Jungle","Desert","Plains"), 0);
+        q("What drops when mining Diamond Ore with Silk Touch?", List.of("Diamond","Diamond Ore Block","Cobblestone","Nothing"), 1);
+        q("Max diamonds from Fortune III on one ore?", List.of("1","2","3","4"), 3);
+        q("Best Y level for Ancient Debris?", List.of("Y=15","Y=30","Y=50","Y=80"), 0);
+        q("What does smelting Iron Ore give?", List.of("Raw Iron","Iron Ingot","Iron Nugget","Iron Block"), 1);
+        q("What can Gravel drop?", List.of("Sand","Flint","Dirt","Stone"), 1);
+        q("Which dimension has Glowstone?", List.of("Overworld","The End","Moon","Nether"), 3);
+        q("Which ore can't be mined with a Stone Pickaxe?", List.of("Coal","Iron","Diamond","Copper"), 2);
+        q("Where is Prismarine found?", List.of("End City","Ocean Monument","Shipwreck","Underwater Ruins"), 1);
+        q("Where do Amethyst Clusters generate?", List.of("Amethyst Geode","The End","Deep Dark","Lush Cave"), 0);
+        q("What happens to Copper Blocks over time?", List.of("Oxidize to green","Rust and break","Turn to Iron","No change"), 0);
+        q("At which Y coordinate are diamonds most common?", List.of("Y=-30","Y=-59","Y=12","Y=0"), 1);
+        q("What enchantment lets you mine Ice without breaking it?", List.of("Silk Touch","Fortune","Efficiency","Unbreaking"), 0);
+        q("In which version was Copper Ore added?", List.of("1.14","1.16","1.17","1.19"), 2);
+        q("Below which Y level does Deepslate start?", List.of("Y=16","Y=0","Y=-32","Y=-48"), 1);
+        q("Which tool has the highest durability?", List.of("Diamond Pickaxe","Gold Pickaxe","Iron Pickaxe","Netherite Pickaxe"), 3);
+        q("Which dimension has Nether Quartz Ore?", List.of("Nether","The End","Overworld","All dimensions"), 0);
+        q("What block does Calcite surround?", List.of("Deepslate","Tuff","Amethyst","Copper Ore"), 2);
+        q("Waxing prevents what from happening to Copper?", List.of("Iron Block","Copper Block","Gold Block","Diamond Block"), 1);
+        q("How long to mine Obsidian with a Diamond Pickaxe?", List.of("5 sec","7.5 sec","9.4 sec","15 sec"), 2);
+        q("How much Redstone Dust does Redstone Ore drop?", List.of("1","2","3","4-5"), 3);
+        q("Where is Clay most commonly found?", List.of("Mountain tops","Deserts","Riverbeds","Underground caves"), 2);
+        // === Mobs & Combat ===
+        q("How long is a Creeper's fuse before exploding?", List.of("0.5 sec","1.5 sec","3 sec","5 sec"), 1);
+        q("What is the Enderman's weakness?", List.of("Fire","Water","Lava","Light"), 1);
+        q("How many Iron Blocks to build an Iron Golem?", List.of("1","2","3","4"), 3);
+        q("What weapon does a Pillager carry?", List.of("Crossbow","Bow","Sword","Axe"), 0);
+        q("What weapon does a Vindicator carry?", List.of("Bow","Sword","Iron Axe","Crossbow"), 2);
+        q("What mob does an Evoker summon?", List.of("Skeleton","Vex","Spider","Zombie"), 1);
+        q("After how many days without sleep do Phantoms appear?", List.of("1","2","3","5"), 2);
+        q("What debuff does an Elder Guardian give?", List.of("Poison","Blindness","Weakness","Mining Fatigue"), 3);
+        q("What do you use to tame a Wolf?", List.of("Bone","Meat","Fish","Wheat"), 0);
+        q("What do you use to tame a Parrot?", List.of("Bread","Apple","Seeds","Sweet Berries"), 2);
+        q("How do you tame a Horse?", List.of("With Apples","With Carrots","With a Saddle","Mount it repeatedly"), 3);
+        q("What does a Blaze drop?", List.of("Blaze Rod","Blaze Powder","Fire Charge","Magma Cream"), 0);
+        q("What does a Ghast drop?", List.of("Ghast Head","Gunpowder","Ghast Tear","Ender Pearl"), 2);
+        q("What spawns Endermites?", List.of("Ender Chest","Enderman Death","End Portal","Ender Pearl"), 3);
+        q("Where do Axolotls naturally spawn?", List.of("Lush Caves","Ocean","River","Swamp"), 0);
+        q("What does a Glow Squid drop?", List.of("Ink Sac","Prismarine Shard","Glow Ink Sac","Glowstone Dust"), 2);
+        q("Do Spiders attack during the day?", List.of("Yes","No","Only on Hard","Random"), 1);
+        q("What is needed to cure a Zombie Villager?", List.of("Golden Apple + Strength Potion","Weakness Potion + Golden Apple","Milk + Bread","Enchanted Golden Apple"), 1);
+        q("What mobs can Cats scare away?", List.of("Spiders & Skeletons","Creepers & Phantoms","Zombies & Skeletons","Spiders & Creepers"), 1);
+        q("What effect do Dolphins give players?", List.of("Dolphin's Grace","Water Breathing","Night Vision","Speed"), 0);
+        q("In what weather do Skeleton Horses spawn?", List.of("Rain","Snow","Thunderstorm","Clear"), 2);
+        q("What happens to a Bee after it stings?", List.of("Dies","Runs away","Keeps attacking","Becomes friendly"), 0);
+        q("What mob do Llamas attack?", List.of("Creeper","Wolf","Zombie","Player"), 1);
+        q("In which biome do Snow Golems melt?", List.of("Plains","Jungle","Desert","Taiga"), 2);
+        q("Where do Wither Skeletons spawn?", List.of("Deep Dark","Nether Wastes","Bastion Remnant","Nether Fortress"), 3);
+        // === Enchanting & Brewing ===
+        q("Can Mending and Infinity coexist?", List.of("Yes","No","Only on Bedrock","Depends on version"), 1);
+        q("Can Silk Touch and Fortune coexist?", List.of("Yes","No","Depends on tool","Depends on level"), 1);
+        q("Which weapon gets the Channeling enchantment?", List.of("Bow","Sword","Crossbow","Trident"), 3);
+        q("What does the Loyalty enchantment do?", List.of("Increase damage","Trident returns automatically","Reduce durability loss","Pierce enemies"), 1);
+        q("What is the max level of Respiration?", List.of("I","II","III","V"), 2);
+        q("What is the max level of Protection?", List.of("I","II","III","IV"), 3);
+        q("What fuel does a Brewing Stand use?", List.of("Blaze Powder","Coal","Redstone Dust","Glowstone Dust"), 0);
+        q("What ingredient makes a Night Vision Potion?", List.of("Spider Eye","Blaze Powder","Golden Carrot","Glow Ink Sac"), 2);
+        q("What is the base for all potions?", List.of("Awkward Potion","Water Bottle","Magma Cream","Spider Eye"), 0);
+        q("What does Redstone Dust do to a potion?", List.of("Enhance effect","Extend duration","Make splash","No effect"), 1);
+        q("What does Glowstone Dust do to a potion?", List.of("Enhance effect","Extend duration","Make splash","Invert effect"), 0);
+        q("What does Gunpowder do to a potion?", List.of("Enhance effect","Extend duration","Make splash potion","Make lingering potion"), 2);
+        q("How many Cobblestone to craft a Furnace?", List.of("4","5","6","8"), 3);
+        q("How many planks to craft a Chest?", List.of("8","6","4","9"), 0);
+        q("How many Wool to craft a Bed?", List.of("1","2","3","4"), 2);
+        q("What is the max level of Sharpness?", List.of("II","III","IV","V"), 3);
+        q("What is needed to craft an Eye of Ender?", List.of("Blaze Powder + Ender Pearl","Ender Pearl + Gold Nugget","Blaze Rod + Ender Pearl","Diamond + Ender Pearl"), 0);
+        q("How many Gunpowder to craft TNT?", List.of("3","4","5","6"), 2);
+        q("How many Iron Blocks to craft an Anvil?", List.of("2","3","4","5"), 1);
+        q("What brews an Awkward Potion?", List.of("Nether Wart + Water Bottle","Spider Eye + Water Bottle","Blaze Powder + Water Bottle","Gold Nugget + Water Bottle"), 0);
+        q("What ingredient makes a Strength Potion?", List.of("Spider Eye","Golden Carrot","Blaze Powder","Ghast Tear"), 2);
+        q("What ingredient makes a Regeneration Potion?", List.of("Golden Carrot","Spider Eye","Blaze Powder","Ghast Tear"), 3);
+        q("How many Iron Ingots to craft a Hopper?", List.of("5","4","3","6"), 0);
+        q("What is needed to craft a Shield?", List.of("Iron Ingot + Leather","Iron Ingot + Planks","Iron Ingot + Wool","Iron Block + Planks"), 1);
+        q("What can Dragon's Breath be used for?", List.of("Brew Strength Potion","Activate Beacon","Craft Lingering Potion","Craft Ender Chest"), 2);
+        // === Biomes & Structures ===
+        q("How many Eyes of Ender for an End Portal?", List.of("8","10","12","16"), 2);
+        q("What is the minimum Nether Portal size?", List.of("4x5","3x3","5x5","2x3"), 0);
+        q("What special block is in the Deep Dark?", List.of("End Stone","Obsidian","Bedrock","Sculk"), 3);
+        q("Where does the Warden spawn?", List.of("Deep Dark","The End","Nether","Ocean Monument"), 0);
+        q("What special mob is in a Woodland Mansion?", List.of("Pillager","Witch","Evoker","Wither"), 2);
+        q("What is special about Mushroom Islands?", List.of("Lots of diamonds","No mob spawning","Always daytime","No trees"), 1);
+        q("What treasure is usually in Shipwrecks?", List.of("Diamond Block","Enchanted Golden Apple","Nether Star","Treasure Map"), 3);
+        q("Which dimension has Bastion Remnants?", List.of("Nether","Overworld","The End","All dimensions"), 0);
+        q("Where is the Stronghold (End Portal)?", List.of("Underwater","Mountain top","Underground","Jungle"), 2);
+        q("In which biome are Cherry Trees found?", List.of("Plains","Cherry Grove","Jungle","Taiga"), 1);
+        q("What special plant is in Lush Caves?", List.of("Hanging Roots & Spore Blossom","Cactus","Sugar Cane","Huge Mushroom"), 0);
+        q("How many Nether biomes are there?", List.of("2","3","4","5"), 3);
+        q("What banner is at a Pillager Outpost?", List.of("Skull Banner","Patterned Banner","Ominous Banner","Dragon Banner"), 2);
+        q("What danger is in Abandoned Mineshafts?", List.of("Cave Spider Spawners","TNT Traps","Wither","Lava Traps"), 0);
+        q("What special block is in Ice Spikes biome?", List.of("Blue Ice","Packed Ice","Frosted Ice","Snow Block"), 1);
+        q("What is the trap in Desert Temples?", List.of("Arrow Trap","Lava Trap","Pit Trap","TNT + Pressure Plate"), 3);
+        q("What mechanism is in Jungle Temples?", List.of("Dispenser + Tripwire","TNT Trap","Lava Pool","Cactus Wall"), 0);
+        q("What is the max build height in the Overworld?", List.of("128","256","320","512"), 2);
+        q("What is the lowest Y coordinate in the Overworld?", List.of("Y=0","Y=-64","Y=-128","Y=-256"), 1);
+        q("What appears after defeating the Ender Dragon?", List.of("End Gateway","Treasure Chest","Nether Portal","Beacon"), 0);
+        q("What is the Nether ceiling height?", List.of("64","100","200","128"), 3);
+        q("Can you mine the Dragon Egg directly?", List.of("Yes, with a pickaxe","Yes, with a shovel","No, not directly","Yes, by hand"), 2);
+        q("1 block in the Nether = how many in the Overworld?", List.of("4","8","12","16"), 1);
+        q("What is the boss in an Ocean Monument?", List.of("Elder Guardian","Guardian","Drowned","Heart of the Sea"), 0);
+        q("What block can prevent Sculk Shriekers?", List.of("Glass","Planks","Wool","Iron Block"), 2);
+        // === Redstone & Farming ===
+        q("What is the max delay of a Redstone Repeater?", List.of("2 ticks","4 ticks","6 ticks","8 ticks"), 1);
+        q("What does a Redstone Comparator do?", List.of("Amplify signal","Delay signal","Compare/detect signal strength","Invert signal"), 2);
+        q("How many blocks can a Sticky Piston pull?", List.of("1","2","3","Unlimited"), 0);
+        q("How many blocks can a Piston push?", List.of("6","8","10","12"), 3);
+        q("What does an Observer detect?", List.of("Redstone signal","Block state changes","Player movement","Light changes"), 1);
+        q("How do you get Wheat Seeds?", List.of("Break grass","Chop trees","Dig dirt","Fishing"), 0);
+        q("What do you use to breed Cows?", List.of("Bread","Wheat","Apple","Carrot"), 1);
+        q("What do you use to breed Pigs?", List.of("Wheat","Bread","Apple","Carrot"), 3);
+        q("What do you use to breed Chickens?", List.of("Seeds","Bread","Wheat","Apple"), 0);
+        q("How tall can Sugar Cane grow?", List.of("1 block","2 blocks","3 blocks","4 blocks"), 2);
+        q("What block can Cactus only be placed on?", List.of("Dirt","Sand","Gravel","Stone"), 1);
+        q("Can Bone Meal speed up plant growth?", List.of("Yes","No","Only flowers","Only trees"), 0);
+        q("How many hunger points does Steak restore?", List.of("4","6","8","10"), 2);
+        q("What effect can a Honey Bottle cure?", List.of("Poison","Weakness","Blindness","All effects"), 0);
+        q("What is the difference between Dispenser and Dropper?", List.of("No difference","Dispenser uses items","Dropper is farther","Dispenser is cheaper"), 1);
+        q("What does a Redstone Lamp need to glow?", List.of("Glowstone Dust","Torch","Redstone signal","Sunlight"), 2);
+        q("What block do Cocoa Beans grow on?", List.of("Jungle Log","Oak Log","Any Log","Dirt"), 0);
+        q("What does Farmland turn into when trampled?", List.of("Grass Block","Dirt","Gravel","Sand"), 1);
+        q("What does a Composter do?", List.of("Turn plants into Bone Meal","Store food","Grow crops","Brew potions"), 0);
+        q("Can Milk clear all status effects?", List.of("Only negative","Clears all","Cannot clear","Only positive"), 1);
+        // === Nether & End ===
+        q("Which boss drops the Nether Star?", List.of("Wither","Ender Dragon","Elder Guardian","Warden"), 0);
+        q("What item do Piglins barter with?", List.of("Diamond","Iron Ingot","Gold Ingot","Emerald"), 2);
+        q("What armor stops Piglins from attacking?", List.of("Diamond","Gold","Iron","Netherite"), 1);
+        q("What effect does Soul Sand have?", List.of("Speed up","Bounce","Glow","Slow down"), 3);
+        q("What does Soul Sand create in water?", List.of("Upward bubble column","Downward bubble column","No effect","Lava"), 0);
+        q("What block are Hoglins afraid of?", List.of("Magma Block","Soul Sand","Warped Fungus","Glowstone"), 2);
+        q("Where is the Elytra found?", List.of("End City item frame","Ender Dragon drop","Nether Fortress","Ocean Monument"), 0);
+        q("What repairs the Elytra?", List.of("Iron Ingot","Leather","Phantom Membrane","Diamond"), 2);
+        q("What is the player's default health?", List.of("10 hearts","20 points (10 hearts)","30 points","40 points"), 1);
+        q("What happens when hunger is depleted?", List.of("Continuous health drain","Cannot move","Vision darkens","No effect"), 0);
+        q("How many blocks to fall to die from full health?", List.of("10","15","20","23+"), 3);
+        q("Can a Water Bucket negate fall damage?", List.of("No","Only halves it","Fully negates","Depends on height"), 2);
+        q("Does Netherite gear burn in lava?", List.of("No","Yes","Depends on time","Depends on depth"), 0);
+        q("What block do Nether Warts grow on?", List.of("Dirt","Netherrack","Soul Sand","Blackstone"), 2);
+        q("How many dimensions does MC have?", List.of("1","2","4","3"), 3);
+        q("Do items disappear when an Ender Chest is broken?", List.of("Yes","No","Depends on difficulty","Random"), 1);
+        q("Can a Name Tag prevent mob despawning?", List.of("Yes","No","Only animals","Only monsters"), 0);
+        q("Can Enchanted Golden Apples be crafted?", List.of("8 Gold Blocks + Apple","Yes","No, loot only","8 Gold Ingots + Apple"), 2);
+        q("Where is the Totem of Undying obtained?", List.of("End City","Nether Fortress","Ocean Monument","Evoker drop"), 3);
+        q("What does a Conduit do?", List.of("Lighting","Underwater attack & breathing","Teleportation","Storage"), 1);
+        // === Trivia ===
+        q("What was Minecraft originally called?", List.of("MineCraft","CraftMine","Cave Game","BlockWorld"), 2);
+        q("Who created Minecraft?", List.of("Notch","Jeb","Dinnerbone","Herobrine"), 0);
+        q("What is the 1.16 update called?", List.of("Caves Update","Nether Update","Ocean Update","Village Update"), 1);
+        q("What is the 1.17-1.18 update called?", List.of("Nether Update","Wild Update","Ocean Update","Caves & Cliffs"), 3);
+        q("What is the 1.19 update called?", List.of("The Wild Update","Caves Update","Village Update","Combat Update"), 0);
+        q("What is the 1.13 update called?", List.of("Village Update","Nether Update","Update Aquatic","Combat Update"), 2);
+        q("What inspired the Creeper's design?", List.of("Intentional design","Failed Pig model","Player suggestion","Modified Spider"), 1);
+        q("What name makes a Sheep rainbow?", List.of("Rainbow","Color","Dinnerbone","jeb_"), 3);
+        q("What happens when you name a mob Dinnerbone?", List.of("Flips upside down","Turns rainbow","Disappears","Grows huge"), 0);
+        q("How do you craft a Netherite Ingot?", List.of("4 Gold Ingots + 4 Netherite Scrap","8 Gold Ingots + 1 Scrap","1 Gold Ingot + 1 Scrap","Furnace smelting"), 0);
+        q("Which block stores 9 Diamonds?", List.of("Chest","Ender Chest","Shulker Box","Diamond Block"), 3);
+        q("How many planks from one Log?", List.of("1","2","4","8"), 2);
+        q("Can you get Enchanted Books from fishing?", List.of("Yes","No","Only in rain","Only with Luck of the Sea"), 0);
+        q("What does a Compass point to?", List.of("North","World spawn point","Nearest village","Player's bed"), 1);
+        q("What does a Lodestone Compass point to?", List.of("Bound Lodestone","North","Spawn point","Nearest player"), 0);
+        q("What is special about Shulker Boxes?", List.of("Infinite storage","Teleport items","Auto-sort","Keep items when broken"), 3);
+        q("What is the 1.14 update called?", List.of("Ocean Update","Combat Update","Village & Pillage","Color Update"), 2);
+        q("How many banner pattern layers max?", List.of("3","6","8","16"), 1);
+        q("What can a Lead be attached to?", List.of("Most passive mobs","All mobs","Only horses","Only wolves"), 0);
+        q("What is a Lightning Rod crafted from?", List.of("Iron Ingots","Copper Ingots","Gold Ingots","Redstone"), 1);
+        q("What collects honey from a full Beehive?", List.of("Bucket","Bowl","Glass Bottle","Bare hand"), 2);
+        q("What activates a Powered Rail?", List.of("Redstone signal","Auto-activates","Activates on placement","Minecart passing"), 0);
+        q("What is needed to craft a Map?", List.of("Paper + Sticks","Leather + Paper","Compass + Paper","Redstone + Paper"), 2);
+        q("Can Torches melt nearby Snow?", List.of("Yes","No","Only snow layers","Depends on distance"), 0);
+        q("What signal can a Lectern with a book emit?", List.of("Light","Sound","Particles","Redstone signal"), 3);
+        q("What is the max level of Efficiency?", List.of("II","III","IV","V"), 3);
+        q("What is needed to craft a Spyglass?", List.of("Glass + Gold Ingot","Amethyst Shard + Copper Ingot","Diamond + Iron Ingot","Glowstone + Copper Ingot"), 1);
+        q("Can a Spawner be mined with Silk Touch?", List.of("Yes","No","Only in Creative","Depends on version"), 1);
+        q("What do you use to tame a Cat?", List.of("Bone","Meat","Raw Fish","Seeds"), 2);
+        q("What do Villagers do at night?", List.of("Keep working","Go home to sleep","Disappear","Turn into Zombies"), 1);
     }
 
     private void q(String text, List<String> options, int correct) {

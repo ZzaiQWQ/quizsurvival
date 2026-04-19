@@ -1,3 +1,13 @@
+/*
+ * Quiz Survival Mod
+ * Copyright (c) 2026 oaoi
+ * https://github.com/ZzaiQWQ/quizsurvival
+ *
+ * This software is licensed under a custom non-commercial license.
+ * You may NOT sell or commercially distribute this software.
+ * You may NOT remove or alter this copyright notice.
+ * See LICENSE file for full terms.
+ */
 package com.quizmod.client;
 
 import com.quizmod.QuizPayloads;
@@ -25,7 +35,7 @@ public class QuizScreen extends Screen {
     private static final String[] LABELS = {"A", "B", "C", "D"};
 
     public QuizScreen(String question, List<String> options, int quizId, String typeName, int wrongCount, int timeLimit, float wrongDamageBase, float wrongDamageMax) {
-        super(Text.literal("答题"));
+        super(Text.literal("Quiz"));
         this.question = question;
         this.options = options;
         this.quizId = quizId;
@@ -35,6 +45,12 @@ public class QuizScreen extends Screen {
         this.wrongDamageBase = wrongDamageBase;
         this.wrongDamageMax = wrongDamageMax;
         this.openTime = System.currentTimeMillis();
+    }
+
+    private boolean isEnglish() {
+        var client = net.minecraft.client.MinecraftClient.getInstance();
+        String lang = client.options.language;
+        return lang != null && lang.startsWith("en");
     }
 
     @Override
@@ -84,12 +100,13 @@ public class QuizScreen extends Screen {
         context.fill(bx + bw - 1, by, bx + bw, by + bh, 0xFFFFAA00);
 
         // 类型标签
+        boolean en = isEnglish();
         context.drawCenteredTextWithShadow(this.textRenderer,
-                "§e§l" + typeName + " §r§7- 答题挑战", centerX, boxTop, 0xFFFFAA00);
+                "§e§l" + typeName + " §r§7- " + (en ? "Quiz Challenge" : "答题挑战"), centerX, boxTop, 0xFFFFAA00);
 
         // 题目标题
         context.drawCenteredTextWithShadow(this.textRenderer,
-                "§6§l⚡ 答题时间 ⚡", centerX, boxTop + 14, 0xFFFFAA00);
+                en ? "§6§l⚡ Quiz Time ⚡" : "§6§l⚡ 答题时间 ⚡", centerX, boxTop + 14, 0xFFFFAA00);
 
         // 题目内容
         context.drawCenteredTextWithShadow(this.textRenderer,
@@ -98,12 +115,16 @@ public class QuizScreen extends Screen {
         // 扣血警告信息
         if (wrongCount > 0) {
             int nextDamage = (int) Math.min(wrongDamageMax, Math.pow(wrongDamageBase, wrongCount));
-            String warning = "§c§l⚠ 已连续答错 " + wrongCount + " 次！下次扣 " + nextDamage + " 点血！";
+            String warning = en
+                    ? "§c§l⚠ " + wrongCount + " wrong in a row! Next: -" + nextDamage + " HP!"
+                    : "§c§l⚠ 已连续答错 " + wrongCount + " 次！下次扣 " + nextDamage + " 点血！";
             context.drawCenteredTextWithShadow(this.textRenderer, warning, centerX, boxTop + 46, 0xFFFF5555);
         } else {
             int firstDamage = (int) Math.min(wrongDamageMax, Math.pow(wrongDamageBase, 0));
-            context.drawCenteredTextWithShadow(this.textRenderer,
-                    "§a首次答题，答错扣 " + firstDamage + " 点血", centerX, boxTop + 46, 0xFF55FF55);
+            String hint = en
+                    ? "§aFirst attempt, wrong = -" + firstDamage + " HP"
+                    : "§a首次答题，答错扣 " + firstDamage + " 点血";
+            context.drawCenteredTextWithShadow(this.textRenderer, hint, centerX, boxTop + 46, 0xFF55FF55);
         }
 
         // 渲染按钮
@@ -138,7 +159,7 @@ public class QuizScreen extends Screen {
         } else {
             // 无倒计时时显示原来的提示
             context.drawCenteredTextWithShadow(this.textRenderer,
-                    "§7答对即可继续" + typeName + "！", centerX, this.height / 2 + 110, 0xFF999999);
+                    isEnglish() ? "§7Answer correctly to continue!" : "§7答对即可继续" + typeName + "！", centerX, this.height / 2 + 110, 0xFF999999);
         }
     }
 
